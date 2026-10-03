@@ -1,7 +1,7 @@
 name: Release APK
 
-# 打 v* 的 tag 就出包。版本名取 tag,版本号取流水线序号 —— 每次发布都有更大的
-# versionCode,已装的用户才能覆盖安装。
+# 打 v* 的 tag 就出包。版本名取 tag(去掉前导 v),版本号取流水线序号 ——
+# 每次发布都有更大的 versionCode,已装的用户才能覆盖安装。
 on:
   push:
     tags: ["v*"]
@@ -32,18 +32,29 @@ jobs:
       - name: 纯逻辑单测
         run: sh gradlew :app:testDebugUnitTest
 
-      - name: 写入签名密钥
+      - name: 写入并校验签名密钥
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         run: |
           if [ -z "$KEYSTORE_BASE64" ]; then
             echo "缺少 secret KEYSTORE_BASE64" >&2
             exit 1
           fi
-          printf '%s' "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
-          ls -l "$RUNNER_TEMP/release.jks"
+          # 先去 CR,再删掉 ----- 开头的 PEM 标记行。
+          # 不要只用 base64 -d -i:PEM 标记里的字母本身就是合法 base64 字符,会让数据流错位。
+          printf '%s' "$KEYSTORE_BASE64" | tr -d '\r' | sed '/^-----/d' | base64 -d > "$RUNNER_TEMP/release.jks"
+          echo "keystore 字节数: $(wc -c < "$RUNNER_TEMP/release.jks")"
+          if ! "$JAVA_HOME/bin/keytool" -list -keystore "$RUNNER_TEMP/release.jks" -storepass "$KEYSTORE_PASSWORD" -alias "$KEY_ALIAS" > /dev/null 2>&1; then
+            echo "密钥库校验失败。常见原因:" >&2
+            echo "  1) KEYSTORE_BASE64 不是 keystore 文件的 base64(例如填成了文件路径或别的内容)" >&2
+            echo "  2) KEYSTORE_PASSWORD 与生成时不一致" >&2
+            echo "  3) KEY_ALIAS 与生成时的 -alias 不一致" >&2
+            exit 1
+          fi
+          echo "密钥库与别名校验通过"
 
-      # 版本名按 Android 惯例不带前导 v(应用信息里显示 0.2.0 而不是 v0.2.0)
       - name: 计算版本名
         run: echo "VERSION_NAME=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
 
@@ -70,7 +81,4 @@ jobs:
         run: |
           ASSET="NekoTodo-android-${TAG}.apk"
           cp app/build/outputs/apk/release/app-release.apk "$ASSET"
-          gh release create "$TAG" \
-            --title "NekoTodo Android ${TAG}" \
-            --generate-notes \
-            "$ASSET"
+          gh release create "$TAG" --title "NekoTodo Android ${TAG}" --generate-notes "$ASSET"
