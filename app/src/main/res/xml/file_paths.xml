@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- 相机拍照时先写到应用缓存目录,再压缩后上传。 -->
+    <cache-path name="captures" path="captures/" />
+</paths>

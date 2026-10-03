@@ -43,3 +43,13 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Android ###
+local.properties
+*.apk
+*.aab
+*.jks
+*.keystore
+captures/
+.cxx/
+release/

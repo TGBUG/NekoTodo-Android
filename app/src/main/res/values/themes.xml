@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Compose 负责全部绘制，这里只定义窗口本身的外观，避免首帧闪白/闪黑。 -->
+    <style name="Theme.NekoTodo" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@android:color/white</item>
+    </style>
+</resources>
