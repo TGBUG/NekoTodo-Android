@@ -32,6 +32,21 @@ printf 'sdk.dir=/path/to/Android/Sdk\n' > local.properties
 
 构建链:Gradle 9.7.1 / AGP 9.4.1 / Kotlin 2.4.20(由 AGP 内置提供,工程里**没有** `org.jetbrains.kotlin.android` 插件)/ Jetpack Compose(compose-bom)。
 
+## 发布
+
+打 tag 即出包(流水线:跑单测 → 构建签名 release APK → 挂到 GitHub Releases):
+
+```bash
+git tag v0.2.0 && git push origin v0.2.0
+```
+
+需要 4 个仓库 Secrets:`KEYSTORE_BASE64`(keystore 文件的 base64)、`KEYSTORE_PASSWORD`、`KEY_ALIAS`、`KEY_PASSWORD`。
+本地要出签名包时导出同名环境变量(键名见 `app/build.gradle.kts`);不提供时 release 产出未签名包(`app-release-unsigned.apk`)。
+
+版本名取自 tag,版本号取自流水线序号——**每次发布都有更大的 versionCode**,已安装的用户才能覆盖升级。
+
+⚠️ keystore 丢失就无法再覆盖升级(只能卸载重装、本机数据全丢),务必在仓库外备份(密码管理器 + 云盘各一份)。
+
 ## 连接后端
 
 首次启动填服务器地址,**不带协议时会自动补 `https://`**;局域网明文 HTTP 必须显式写 `http://`(此时会提示"该连接未加密")。
