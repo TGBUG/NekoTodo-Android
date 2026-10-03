@@ -1,6 +1,7 @@
 package cn.tgbug.nekotodo.ui.tasks
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -75,6 +76,7 @@ fun TaskListScreen(
     viewModel: TasksViewModel,
     onSignOut: () -> Unit,
     onOpenAiCreate: () -> Unit,
+    onOpenMap: () -> Unit,
     onOpenSearch: () -> Unit,
     onOpenAccount: () -> Unit,
     onOpenSource: (Long) -> Unit,
@@ -149,10 +151,9 @@ fun TaskListScreen(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
+      Box(modifier = Modifier.fillMaxSize().padding(padding)) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding),
+            modifier = Modifier.fillMaxSize(),
         ) {
             CategoryBar(
                 categories = state.categories,
@@ -185,6 +186,24 @@ fun TaskListScreen(
                 )
             }
         }
+
+        // 对标 Web 端左下角那个"源映射模式"浮动按钮。
+        Surface(
+            onClick = onOpenMap,
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(16.dp),
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.surface,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+        ) {
+            Text(
+                text = "源映射模式",
+                style = MaterialTheme.typography.labelLarge,
+                modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+            )
+        }
+      }
     }
 
     formRequest?.let { request ->

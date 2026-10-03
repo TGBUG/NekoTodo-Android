@@ -11,6 +11,7 @@ import cn.tgbug.nekotodo.AppContainer
 import cn.tgbug.nekotodo.ui.account.AccountScreen
 import cn.tgbug.nekotodo.ui.ai.AiCreateScreen
 import cn.tgbug.nekotodo.ui.appearance.AppearanceScreen
+import cn.tgbug.nekotodo.ui.map.StarMapScreen
 import cn.tgbug.nekotodo.ui.search.SearchScreen
 import cn.tgbug.nekotodo.ui.source.SourceDetailScreen
 import cn.tgbug.nekotodo.ui.tasks.TaskListScreen
@@ -21,6 +22,7 @@ private object Routes {
     const val SEARCH = "search"
     const val ACCOUNT = "account"
     const val APPEARANCE = "appearance"
+    const val STAR_MAP = "star-map"
     const val SOURCE_DETAIL = "source"
 
     fun sourceDetail(sourceInfoId: Long): String = "$SOURCE_DETAIL/$sourceInfoId"
@@ -46,6 +48,7 @@ fun MainScreen(container: AppContainer, onSignOut: () -> Unit) {
                 onOpenSearch = { navController.navigate(Routes.SEARCH) },
                 onOpenAccount = { navController.navigate(Routes.ACCOUNT) },
                 onOpenSource = { id -> navController.navigate(Routes.sourceDetail(id)) },
+                onOpenMap = { navController.navigate(Routes.STAR_MAP) },
             )
         }
 
@@ -71,6 +74,15 @@ fun MainScreen(container: AppContainer, onSignOut: () -> Unit) {
                 onBack = { navController.popBackStack() },
                 onSignOut = onSignOut,
                 onOpenAppearance = { navController.navigate(Routes.APPEARANCE) },
+            )
+        }
+
+        composable(Routes.STAR_MAP) {
+            StarMapScreen(
+                viewModel = viewModel(factory = AppViewModelProvider.Factory),
+                onBack = { navController.popBackStack() },
+                onOpenSource = { id -> navController.navigate(Routes.sourceDetail(id)) },
+                onSessionExpired = onSignOut,
             )
         }
 

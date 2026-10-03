@@ -9,6 +9,7 @@ import cn.tgbug.nekotodo.ui.account.AccountViewModel
 import cn.tgbug.nekotodo.ui.ai.AiCreateViewModel
 import cn.tgbug.nekotodo.ui.appearance.AppearanceViewModel
 import cn.tgbug.nekotodo.ui.login.LoginViewModel
+import cn.tgbug.nekotodo.ui.map.StarMapViewModel
 import cn.tgbug.nekotodo.ui.search.SearchViewModel
 import cn.tgbug.nekotodo.ui.source.SourceDetailViewModel
 import cn.tgbug.nekotodo.ui.tasks.TasksViewModel
@@ -24,6 +25,7 @@ object AppViewModelProvider {
         initializer { AccountViewModel(nekotodoApp().container) }
         initializer { SourceDetailViewModel(nekotodoApp().container) }
         initializer { AppearanceViewModel(nekotodoApp().container) }
+        initializer { StarMapViewModel(nekotodoApp().container) }
     }
 }
 
