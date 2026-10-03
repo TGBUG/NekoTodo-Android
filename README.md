@@ -56,6 +56,17 @@ git tag v0.2.0 && git push origin v0.2.0
 6. **后端返回的时间戳可能不带末尾 `Z`**(实际观测如此,文档写的是 UTC ISO 8601),客户端按 UTC 兼容解析
 7. 源信息里没有可拆解内容时,后端会让整次拆解以 `RuntimeError: agent made no tool calls` 失败(观感上更像后端应"完成并新建 0 个任务")
 
+## 应用图标
+
+源图是 `docs/branding/icon-source.jpg`(1024×1024,满幅渐变 + 居中画作)。图标做成**自适应图标的两层**:
+
+- `mipmap-*/ic_launcher_background.jpg` —— 源图自身放大 + 强模糊得到的渐变,满幅,掩码裁它没问题
+- `mipmap-*/ic_launcher_foreground.webp` —— 画作缩到画布 82%、边缘羽化、居中,透明底
+
+之所以要这么合成:系统掩码会裁掉自适应图标外围约 1/3,而源图的画作几乎顶到边缘,直接当图标会把猫耳和清单切掉。缩到安全区后,被裁的只是渐变留白。
+
+⚠️ 前景层**不能用"没有任何 path 的空 vector"**:启动器会渲染失败、静默退回系统默认图标(踩过一次,logcat 里还没有任何报错)。
+
 ## 目录结构
 
 ```
@@ -66,6 +77,7 @@ app/src/main/kotlin/cn/tgbug/nekotodo/
 │               媒体处理(拍照压缩、背景图模糊、带鉴权的图片读取)
 ├── ui/         各页面(登录/任务列表/搜索/账户/外观/AI 创建/源信息详情/星图)与主题
 docs/agents/    issue tracker、triage 标签、领域文档的约定
+docs/branding/  应用图标源图(1024×1024)
 docs/reference/ Web 端单 HTML 客户端的快照(本仓库之外没有可链接的权威源)
 ```
 
