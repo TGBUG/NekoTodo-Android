@@ -30,7 +30,7 @@ jobs:
 
       # 先跑测试:测试挂了就不该出包
       - name: 纯逻辑单测
-        run: ./gradlew :app:testDebugUnitTest
+        run: sh gradlew :app:testDebugUnitTest
 
       - name: 写入签名密钥
         env:
@@ -55,7 +55,7 @@ jobs:
           NEKOTODO_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           NEKOTODO_VERSION_NAME: ${{ env.VERSION_NAME }}
           NEKOTODO_VERSION_CODE: ${{ github.run_number }}
-        run: ./gradlew :app:assembleRelease
+        run: sh gradlew :app:assembleRelease
 
       # 确认真的签过名:未签名的包在 Android 上根本装不上
       - name: 校验签名
