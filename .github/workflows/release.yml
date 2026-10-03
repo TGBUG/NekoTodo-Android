@@ -43,13 +43,17 @@ jobs:
           printf '%s' "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
           ls -l "$RUNNER_TEMP/release.jks"
 
+      # 版本名按 Android 惯例不带前导 v(应用信息里显示 0.2.0 而不是 v0.2.0)
+      - name: 计算版本名
+        run: echo "VERSION_NAME=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+
       - name: 构建签名 release APK
         env:
           NEKOTODO_KEYSTORE_PATH: ${{ runner.temp }}/release.jks
           NEKOTODO_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           NEKOTODO_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           NEKOTODO_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          NEKOTODO_VERSION_NAME: ${{ github.ref_name }}
+          NEKOTODO_VERSION_NAME: ${{ env.VERSION_NAME }}
           NEKOTODO_VERSION_CODE: ${{ github.run_number }}
         run: ./gradlew :app:assembleRelease
 
